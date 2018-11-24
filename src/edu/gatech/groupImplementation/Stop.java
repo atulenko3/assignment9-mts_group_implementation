@@ -64,7 +64,19 @@ public class Stop {
 	public void setLongitude(Double longitude) {
 		this.longitude = longitude;
 	}
-
+	
+	public void setProbabilities(int ridersArriveHigh, int ridersArriveLow, int ridersOffHigh, int ridersOffLow, int ridersOnHigh, int ridersOnLow,
+			int ridersDepartHigh, int ridersDepartLow) {
+		this.ridersArriveHigh = Integer.valueOf(ridersArriveHigh);
+		this.ridersArriveLow = Integer.valueOf(ridersArriveLow);
+		this.ridersOffHigh = Integer.valueOf(ridersOffHigh);
+		this.ridersOffLow = Integer.valueOf(ridersOffLow);
+		this.ridersOnHigh = Integer.valueOf(ridersOnHigh);
+		this.ridersOnLow = Integer.valueOf(ridersOnLow);
+		this.ridersDepartHigh = Integer.valueOf(ridersDepartHigh);
+		this.ridersDepartLow = Integer.valueOf(ridersDepartLow);
+	}
+	
 	public Integer getRidersArriveHigh() {
 		return ridersArriveHigh;
 	}
@@ -145,6 +157,10 @@ public class Stop {
 		this.transferRiders = transferRiders;
 	}
 
+	public Double findDistance(Stop nextStop) {
+		return Double.valueOf(70.0D * Math.sqrt(Math.pow(latitude - nextStop.getLatitude(), 2.0D) + Math.pow(longitude - nextStop.getLongitude(), 2.0D)));
+	}
+	
 	@Override
 	public String toString() {
 		return "Stop [ id= " + id + ",name= " + name + "]";

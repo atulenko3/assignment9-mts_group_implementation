@@ -11,8 +11,8 @@ public class Event {
 		busId = Integer.valueOf(id);
 	}
 	
-	public int getRank() {
-		return Integer.valueOf(rank);
+	public Integer getRank() {
+		return rank.intValue();
 	}
 
 	public void setRank(int rank) {
@@ -27,8 +27,8 @@ public class Event {
 		this.type = type;
 	}
 
-	public int getId() {
-		return Integer.valueOf(busId);
+	public Integer getId() {
+		return busId.intValue();
 	}
 
 	public void setId(int id) {
