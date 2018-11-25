@@ -24,6 +24,26 @@ public class Stop {
 		this.latitude = Double.valueOf(latitude);
 		this.longitude = Double.valueOf(longitude);
 	}
+
+    //Copy Constructor
+    public Stop (Stop stop)
+    {
+        this.id = stop.getId();
+        this.name = stop.getName();
+        this.riders = stop.getRiders();
+        this.latitude = stop.getLatitude();
+        this.longitude = stop.getLongitude();
+        this.ridersArriveHigh = stop.getRidersArriveHigh();
+        this.ridersArriveLow = stop.getRidersArriveLow();
+        this.ridersOffHigh = stop.getRidersOffHigh();
+        this.ridersOffLow = stop.getRidersOffLow();
+        this.ridersOnHigh = stop.getRidersOnHigh();
+        this.ridersOnLow = stop.getRidersOnLow();
+        this.ridersDepartHigh = stop.getRidersDepartHigh();
+        this.ridersDepartLow = stop.getRidersDepartLow();
+        this.waitingPassengers = stop.getWaitingPassengers();
+        this.transferRiders = stop.getTransferRiders();
+    }
 	
 	public Integer getId() {
 		return id;

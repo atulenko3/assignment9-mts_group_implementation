@@ -16,6 +16,19 @@ public class Bus {
 		nextLocation = currentLocation = Integer.valueOf(location);
 		averageSpeed = Integer.valueOf(speed);	
 		}
+
+
+    public Bus (Bus bus)
+    {
+        id = bus.getId();
+        route = bus.getRoute();
+        nextLocation = bus.getNextLocation();
+        currentLocation = bus.getCurrentLocation();
+        passengers = bus.getPassengers();
+        passengerCapacity = bus.getPassengerCapacity();
+        averageSpeed = bus.getAverageSpeed();
+        arrivalTime = bus.getArrivalTime();
+    }
 	
 	public Integer getId() {
 		return id;

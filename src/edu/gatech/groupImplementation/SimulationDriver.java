@@ -11,6 +11,8 @@ public class SimulationDriver {
 	}
 	
 	public void moveNextBus() { mts.triggerNextEvent(); }
+
+    public void revertEvent() { mts.revertState(); }
 	
     public static void main(String[] args) {
     	SimulationDriver transitSimulation = new SimulationDriver();
@@ -73,9 +75,65 @@ public class SimulationDriver {
             e.printStackTrace();
             System.out.println();
         }*/
-        
+
+        test20Runs(transitSimulation);
+        //test1Revert(transitSimulation);
+        //test2Revert(transitSimulation);
+        //test3Revert(transitSimulation);
+    }
+
+    /*
+    Test Cases - could move these to separate files if we want
+     */
+    private static void test20Runs(SimulationDriver transitSimulation) {
         for(int i=0;i<20;i++) {
-        transitSimulation.moveNextBus();  //This command runs the simulation for a total of 20 events
+            transitSimulation.moveNextBus();  //This command runs the simulation for a total of 20 events
+        }
+    }
+
+    private static void test1Revert(SimulationDriver transitSimulation) {
+        for(int i=0;i<10;i++) {
+            transitSimulation.moveNextBus();  //This command runs the simulation for a total of 20 events
+        }
+
+        transitSimulation.revertEvent();
+        System.out.println("RevertEvent");
+
+        for(int i=0;i<10;i++) {
+            transitSimulation.moveNextBus();  //This command runs the simulation for a total of 20 events
+        }
+    }
+
+    private static void test2Revert(SimulationDriver transitSimulation) {
+        for(int i=0;i<10;i++) {
+            transitSimulation.moveNextBus();  //This command runs the simulation for a total of 20 events
+        }
+
+        transitSimulation.revertEvent();
+        System.out.println("RevertEvent");
+        transitSimulation.revertEvent();
+        System.out.println("RevertEvent");
+
+        for(int i=0;i<10;i++) {
+            transitSimulation.moveNextBus();  //This command runs the simulation for a total of 20 events
+        }
+    }
+
+    private static void test3Revert(SimulationDriver transitSimulation) {
+        for(int i=0;i<10;i++) {
+            transitSimulation.moveNextBus();  //This command runs the simulation for a total of 20 events
+        }
+
+        transitSimulation.revertEvent();
+        System.out.println("RevertEvent");
+        transitSimulation.revertEvent();
+        System.out.println("RevertEvent");
+        transitSimulation.revertEvent();
+        System.out.println("RevertEvent");
+
+
+        for(int i=0;i<10;i++) {
+            transitSimulation.moveNextBus();  //This command runs the simulation for a total of 20 events
         }
     }
 }
