@@ -2,6 +2,7 @@ package edu.gatech.groupImplementation;
 
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Random;
 
@@ -16,14 +17,14 @@ public class DiscreteSimulationController {
 	private HashMap<Integer,Route> routes;
 	private HashMap<Integer,Bus> buses;
 	private HashMap<Integer,Stop> stops;
-	private HashMap<Integer,SystemState> systemStates;
 	private Random rand;
+	private LinkedList<SystemState> systemStates;
 	
 	public DiscreteSimulationController() {
 		routes = new HashMap<Integer,Route>();
 		buses = new HashMap<Integer,Bus>();
 		stops = new HashMap<Integer,Stop>();
-		systemStates = new HashMap<Integer,SystemState>();
+		systemStates = new LinkedList<SystemState>();
 		eventComparator = new EventComparator();
 		eventQueue = new PriorityQueue<Event>(100, eventComparator);
 		rand = new Random();
@@ -61,6 +62,7 @@ public class DiscreteSimulationController {
 	
 	public void triggerNextEvent() {
 		if (eventQueue.size() > 0) {
+			PriorityQueue<Event> eventQueueSnapshot = new PriorityQueue<>(eventQueue);
 			Event activeEvent = eventQueue.poll();
 			switch (activeEvent.getType()) {
 			case "move_bus":
@@ -72,7 +74,9 @@ public class DiscreteSimulationController {
 				
 				int activeStopId = activeRoute.getCurrentStop(activeLocation); //Based on the activeLocation on the route get the activeStopId
 				Stop activeStop = getStop(activeStopId); //Returns the stop object identified by activeStopId
-				
+
+				updateSystemStates(activeBus, activeStop, eventQueueSnapshot);
+
 				//TODO Passenger Management
 				/**************************/
 				int ridersArrive, ridersOff, ridersOn, ridersDepart;
@@ -163,6 +167,22 @@ public class DiscreteSimulationController {
 	    return null;
 	  }
 
+	private void updateBus(int busID, Bus bus) {
+		if (buses.containsKey(Integer.valueOf(busID))) {
+			buses.put(busID, bus);
+		}
+	}
+
+	private void updateStop(int stopID, Stop stop) {
+		if (stops.containsKey(Integer.valueOf(stopID))) {
+			stops.put(stopID, stop);
+		}
+	}
+
+	private void updateEvents(PriorityQueue<Event> eventQueueSnapshot) {
+		eventQueue = eventQueueSnapshot;
+	}
+
 	public Double getKWaiting() {
 		return kWaiting;
 	}
@@ -222,5 +242,24 @@ public class DiscreteSimulationController {
 	public Double getSystemEfficiency() {
 		return Double.valueOf(Double.valueOf(kWaiting) * waitingPassengers().doubleValue() + Double.valueOf(kBuses) * Double.valueOf(busCost()) + 
 				Double.valueOf(kCombined) * waitingPassengers().doubleValue() * Double.valueOf(busCost()));
+	}
+
+	public void revertState() {
+		if (this.systemStates.size() > 0) {
+			SystemState previousState = this.systemStates.removeLast();
+
+			updateBus(previousState.getBus().getId(), previousState.getBus());
+
+			updateStop(previousState.getStop().getId(), previousState.getStop());
+
+			updateEvents(previousState.getQueueSnapshot());
+		}
+	}
+
+	public void updateSystemStates(Bus bus, Stop stop, PriorityQueue<Event> eventQueueSnapshot) {
+		this.systemStates.add(new SystemState(new Bus(bus), new Stop(stop), eventQueueSnapshot));
+		if (this.systemStates.size() > 3) {
+			this.systemStates.pop();
+		}
 	}
 }
