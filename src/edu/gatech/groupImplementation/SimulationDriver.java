@@ -17,7 +17,7 @@ public class SimulationDriver {
     	
         final String DELIMITER = ",";
         String scenarioFile = args[0];
-        //String probabilityBounds = args[1];  //Disabled for now, need to implement passengers exchanges to test this
+        String probabilityBounds = args[1];  //Disabled for now, need to implement passengers exchanges to test this
 
         try { //Read the first file in args[0] - add route, stop, bus, etc
             Scanner takeCommand = new Scanner(new File(scenarioFile));
@@ -56,15 +56,15 @@ public class SimulationDriver {
             System.out.println();
         }
         
-/*        try { //Reads the second file in args[1] which includes the probabilities for the passenger exchanges
+        try { //Reads the second file in args[1] which includes the probabilities for the passenger exchanges
             Scanner takeProbabilities = new Scanner(new File(probabilityBounds));
-            String[] tokens;
+            String[] bounds;
 
             do {
                 String userCommandLine = takeProbabilities.nextLine();
-                tokens = userCommandLine.split(DELIMITER);
+                bounds = userCommandLine.split(DELIMITER);
 
-                mts.addProbabilities(Integer.parseInt(tokens[0]), Integer.parseInt(tokens[1]), Integer.parseInt(tokens[2]), Integer.parseInt(tokens[3]), Integer.parseInt(tokens[4]), Integer.parseInt(tokens[5]), Integer.parseInt(tokens[6]), Integer.parseInt(tokens[7]), Integer.parseInt(tokens[8]));
+                mts.addProbabilities(Integer.parseInt(bounds[0]), Integer.parseInt(bounds[1]), Integer.parseInt(bounds[2]), Integer.parseInt(bounds[3]), Integer.parseInt(bounds[4]), Integer.parseInt(bounds[5]), Integer.parseInt(bounds[6]), Integer.parseInt(bounds[7]), Integer.parseInt(bounds[8]));
                	
                 } while (takeProbabilities.hasNextLine());
 
@@ -72,10 +72,11 @@ public class SimulationDriver {
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println();
-        }*/
+        }
         
         for(int i=0;i<20;i++) {
         transitSimulation.moveNextBus();  //This command runs the simulation for a total of 20 events
         }
+     System.out.println(mts.getSystemEfficiency());   
     }
 }

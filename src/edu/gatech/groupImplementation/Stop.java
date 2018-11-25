@@ -14,8 +14,8 @@ public class Stop {
 	private Integer ridersOnLow;
 	private Integer ridersDepartHigh;
 	private Integer ridersDepartLow;
-	private Integer waitingPassengers;
-	private Integer transferRiders = 0; 
+	private Integer waitingPassengers = 0;
+	private Integer transferRiders = 0;
 	
 	public Stop (int uniqueId,String name,int initialRiders, double latitude, double longitude) {
 		id = Integer.valueOf(uniqueId);
@@ -92,6 +92,8 @@ public class Stop {
 	public void setRidersArriveLow(Integer ridersArriveLow) {
 		this.ridersArriveLow = ridersArriveLow;
 	}
+	
+	public void ridersWaiting(int ridersArrive) {this.waitingPassengers += Integer.valueOf(ridersArrive);}
 
 	public Integer getRidersDepartHigh() {
 		return ridersDepartHigh;
@@ -125,6 +127,17 @@ public class Stop {
 		this.ridersOnLow = ridersOnLow;
 	}
 	
+	public void boardPassengers(int ridersOn)
+	{
+		if (ridersOn <= this.waitingPassengers.intValue())
+		{
+			waitingPassengers -= ridersOn;
+		} else {
+			waitingPassengers = 0;
+			System.out.println("More passengers got on than there were available --> fix logic");
+		}
+	}	
+	
 	public Integer getRidersOffHigh() {
 		return ridersOffHigh;
 	}
@@ -157,6 +170,17 @@ public class Stop {
 		this.transferRiders = transferRiders;
 	}
 
+	public void updateTransfers(int ridersDepart) {
+		int nowWaiting = transferRiders - ridersDepart;
+		transferRiders -= ridersDepart;
+		waitingPassengers += nowWaiting;
+	}
+
+	public void updateWaiting(int ridersDepart) {
+		waitingPassengers += (transferRiders - ridersDepart);
+		transferRiders = Integer.valueOf(0);
+	}
+	
 	public Double findDistance(Stop nextStop) {
 		return Double.valueOf(70.0D * Math.sqrt(Math.pow(latitude - nextStop.getLatitude(), 2.0D) + Math.pow(longitude - nextStop.getLongitude(), 2.0D)));
 	}

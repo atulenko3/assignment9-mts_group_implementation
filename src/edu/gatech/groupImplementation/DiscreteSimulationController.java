@@ -3,6 +3,7 @@ package edu.gatech.groupImplementation;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.PriorityQueue;
+import java.util.Random;
 
 public class DiscreteSimulationController {
 	private Double kWaiting = 1.0;
@@ -16,6 +17,7 @@ public class DiscreteSimulationController {
 	private HashMap<Integer,Bus> buses;
 	private HashMap<Integer,Stop> stops;
 	private HashMap<Integer,SystemState> systemStates;
+	private Random rand;
 	
 	public DiscreteSimulationController() {
 		routes = new HashMap<Integer,Route>();
@@ -24,26 +26,29 @@ public class DiscreteSimulationController {
 		systemStates = new HashMap<Integer,SystemState>();
 		eventComparator = new EventComparator();
 		eventQueue = new PriorityQueue<Event>(100, eventComparator);
+		rand = new Random();
 		
 	}
 	public void makeStop(int uniqueId,String name, int riders, double latitude, double longitude) {
-		stops.put(uniqueId, new Stop(uniqueId, name, riders, latitude, longitude));
+		stops.put(Integer.valueOf(uniqueId), new Stop(uniqueId, name, riders, latitude, longitude));
 		};
 		
 	// This method allows us to set the probabilities for each stop currently available in the system (based on the first setup file)
-	public void addProbabilities(int stopId,int ridersArriveHigh, int ridersArriveLow, int ridersOffHigh, int ridersOffLow, int ridersOnHigh, int ridersOnLow,
-			int ridersDepartHigh, int ridersDepartLow) {
+	public void addProbabilities(int stopId,int ridersArriveHigh, int ridersArriveLow, int ridersOffHigh, int ridersOffLow, int ridersOnHigh, int ridersOnLow,int ridersDepartHigh, int ridersDepartLow) {
 		if (stops.containsKey(Integer.valueOf(stopId))) {
-			stops.get(Integer.valueOf(stopId)).setProbabilities(ridersArriveHigh,ridersArriveLow,ridersOffHigh,ridersOffLow,ridersOnHigh,ridersOnLow,ridersDepartHigh,ridersDepartLow);
-		} System.out.println("StopId:" + stopId + ", does not exist in the current system - ignoring command"); //If the stop doesnt exist, will print the console
+			stops.get(stopId).setProbabilities(ridersArriveHigh,ridersArriveLow,ridersOffHigh,ridersOffLow,ridersOnHigh,ridersOnLow,ridersDepartHigh,ridersDepartLow);
+			System.out.println("StopId: " + stopId + ", exist in the current system - adding probability bounds!");
+		} else {
+			System.out.println("StopId: " + stopId + ", does not exist in the current system - ignoring command"); //If the stop doesnt exist, will print to console
+		}
 	}
 		
 	public void makeRoute(int uniqueId, int number, String name) {
-		routes.put(uniqueId, new Route(uniqueId, number, name));
+		routes.put(Integer.valueOf(uniqueId), new Route(uniqueId, number, name));
 	};
 	
 	public void makeBus(int uniqueId,int routeId, int location, int initialCapacity, int speed) {
-		buses.put(uniqueId, new Bus(uniqueId, routeId, location, initialCapacity, speed));
+		buses.put(Integer.valueOf(uniqueId), new Bus(uniqueId, routeId, location, initialCapacity, speed));
 	};
 	
 	public void addStopToRoute(int routeId, int stopId) {
@@ -69,6 +74,55 @@ public class DiscreteSimulationController {
 				Stop activeStop = getStop(activeStopId); //Returns the stop object identified by activeStopId
 				
 				//TODO Passenger Management
+				/**************************/
+				int ridersArrive, ridersOff, ridersOn, ridersDepart;
+				//Step 1
+				try {
+					ridersArrive = rand.ints(activeStop.getRidersArriveLow().intValue(),activeStop.getRidersArriveHigh().intValue()).findFirst().getAsInt();
+					} 
+				catch (IllegalArgumentException e) { //Need this catch here since some of the bounds in the file are the same 
+					ridersArrive = activeStop.getRidersArriveLow().intValue();
+				}
+				
+				activeStop.ridersWaiting(ridersArrive); //Populates the waitingPassengers group
+				
+				//Step 2
+				try {
+					ridersOff = rand.ints(activeStop.getRidersOffLow().intValue(),activeStop.getRidersOffHigh().intValue()).findFirst().getAsInt();
+					} 
+				catch (IllegalArgumentException e) { //Need this catch here since some of the bounds in the file are the same 
+					ridersOff = activeStop.getRidersOffLow().intValue();
+				} 
+	
+				activeStop.setTransferRiders(activeBus.ridersOff(ridersOff)); //Takes passengers off the bus, and updates the transfer group
+				
+				//Step 3
+				try {
+					ridersOn = rand.ints(activeStop.getRidersOnLow().intValue(),activeStop.getRidersOnHigh().intValue()).findFirst().getAsInt();
+					} 
+				catch (IllegalArgumentException e) { //Need this catch here since some of the bounds in the file are the same 
+					ridersOn = activeStop.getRidersOnLow().intValue();
+				} 
+				
+				activeStop.boardPassengers(activeBus.ridersOn(ridersOn)); // Board passengers, if greater than the capacity, overflow passengers get added back to waitingGroup
+				
+				//Step 4
+				try {
+					ridersDepart = rand.ints(activeStop.getRidersDepartLow().intValue(), activeStop.getRidersDepartHigh().intValue()).findFirst().getAsInt();
+				}
+				catch (IllegalArgumentException e) {
+					ridersDepart = activeStop.getRidersDepartLow().intValue();
+				}
+				
+				int transferRidersCurrent = activeStop.getTransferRiders().intValue();
+				
+				if (ridersDepart <= transferRidersCurrent) {
+					activeStop.updateTransfers(ridersDepart);
+				} else {
+					activeStop.updateWaiting(ridersDepart);
+				}
+				
+				/*********************/
 				
 				int nextLocation = activeRoute.getNextLocation(activeLocation); //Based on the activeLocation, returns the nextLocation's position on the route
 				int nextStopId = activeRoute.getCurrentStop(nextLocation); //Based on the nextLocation on the route get the activeStopId
@@ -81,7 +135,9 @@ public class DiscreteSimulationController {
 				activeBus.setArrivalTime(nextArrivalTime); //Updates the arrivalTime attribute of the bus object
 				eventQueue.add(new Event(nextArrivalTime, "move_bus", activeEvent.getId())); //Queue the next event for this bus that is to occur at the previously calculated logical time
 				
-				System.out.println("b:" + activeBus.getId() + "->s:" + nextStopId + "@" + activeBus.getArrivalTime() + "//p:0/f:0"); //Output summary to console for each event
+				System.out.println("Riders Arrive: " + ridersArrive + ", Riders Off: " + ridersOff + ", Riders On: " + ridersOn + ", Riders Depart: " + ridersDepart);
+				System.out.println("Waiting Pool: " + activeStop.getWaitingPassengers() + ", transferRiders: " + activeStop.getTransferRiders());
+				System.out.println("b:" + activeBus.getId() + "->s:" + nextStopId + "@" + activeBus.getArrivalTime() + "//p:" + activeBus.getPassengers() + "/bc: " + activeBus.getPassengerCapacity()); //Output summary to console for each event
 				break;
 			default:
 				System.out.println("This is not valid event");
@@ -150,7 +206,7 @@ public class DiscreteSimulationController {
 	public Integer waitingPassengers() {
 		Integer totalPassengers = 0;
 		for (Stop stop: stops.values()) {
-			totalPassengers =+ stop.getWaitingPassengers();
+			totalPassengers += stop.getWaitingPassengers();
 		}
 		return totalPassengers;
 	}
@@ -158,7 +214,7 @@ public class DiscreteSimulationController {
 	public Double busCost() {
 		Double busCost = Double.valueOf(0.0);
 		for (Bus bus: buses.values()) {
-			busCost =+ (Double.valueOf(kSpeed) * bus.getAverageSpeed().doubleValue() + Double.valueOf(kCapacity) * bus.getPassengerCapacity().doubleValue());
+			busCost += (Double.valueOf(kSpeed) * bus.getAverageSpeed().doubleValue() + Double.valueOf(kCapacity) * bus.getPassengerCapacity().doubleValue());
 		}
 		return busCost;
 	}

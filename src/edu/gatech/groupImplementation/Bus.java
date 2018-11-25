@@ -14,7 +14,8 @@ public class Bus {
 		id = Integer.valueOf(uniqueId);
 		route = Integer.valueOf(routeId);
 		nextLocation = currentLocation = Integer.valueOf(location);
-		averageSpeed = Integer.valueOf(speed);	
+		passengerCapacity = Integer.valueOf(initialCapacity);
+		averageSpeed = Integer.valueOf(speed);
 		}
 	
 	public Integer getId() {
@@ -54,6 +55,28 @@ public class Bus {
 		this.passengers = passengers;
 	}
 
+	public Integer ridersOff(int ridersOff) {
+		if (ridersOff <= this.passengers.intValue()) {
+			passengers =- ridersOff;
+			return Integer.valueOf(ridersOff);
+		} else {
+			int totalPassengers = passengers;
+			passengers = 0;
+			return Integer.valueOf(totalPassengers);
+		}
+	}
+
+	public Integer ridersOn(int ridersOn) {
+		if (ridersOn <= (passengerCapacity.intValue() - passengers.intValue())) {
+			passengers =+ ridersOn;
+			return ridersOn;
+		} else {
+			passengers = passengerCapacity;
+			return passengerCapacity.intValue() - passengers.intValue();
+		}
+		
+	}
+	
 	public Integer getPassengerCapacity() {
 		return passengerCapacity;
 	}
