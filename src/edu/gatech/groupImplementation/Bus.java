@@ -9,12 +9,18 @@ public class Bus {
 	private Integer passengerCapacity;
 	private Integer averageSpeed;
 	private Integer arrivalTime;
+	private boolean busRouteUpdateRequested = false;
+	private boolean busRouteUpdateRequestedTwice = false;
+	private Integer routeUpdateId;
+    private Integer routeUpdateStopIndex;
+
 	
 	public Bus (int uniqueId,int routeId, int location, int initialCapacity, int speed) {
 		id = Integer.valueOf(uniqueId);
 		route = Integer.valueOf(routeId);
 		nextLocation = currentLocation = Integer.valueOf(location);
-		averageSpeed = Integer.valueOf(speed);	
+		passengerCapacity = Integer.valueOf(initialCapacity);
+		averageSpeed = Integer.valueOf(speed);
 		}
 
 
@@ -67,6 +73,28 @@ public class Bus {
 		this.passengers = passengers;
 	}
 
+	public Integer ridersOff(int ridersOff) {
+		if (ridersOff <= this.passengers.intValue()) {
+			passengers =- ridersOff;
+			return Integer.valueOf(ridersOff);
+		} else {
+			int totalPassengers = passengers;
+			passengers = 0;
+			return Integer.valueOf(totalPassengers);
+		}
+	}
+
+	public Integer ridersOn(int ridersOn) {
+		if (ridersOn <= (passengerCapacity.intValue() - passengers.intValue())) {
+			passengers =+ ridersOn;
+			return ridersOn;
+		} else {
+			passengers = passengerCapacity;
+			return passengerCapacity.intValue() - passengers.intValue();
+		}
+		
+	}
+	
 	public Integer getPassengerCapacity() {
 		return passengerCapacity;
 	}
@@ -93,8 +121,20 @@ public class Bus {
 	
 	public void updateRoute(int routeId, int locationWithinRoute) {
 		route = Integer.valueOf(routeId);
-		currentLocation = Integer.valueOf(locationWithinRoute);
+        nextLocation = Integer.valueOf(locationWithinRoute);
 	}
+
+	public boolean getBusRouteUpdateRequested() {return busRouteUpdateRequested;}
+    public void setBusRouteUpdateRequested(boolean busRouteUpdateRequested) {this.busRouteUpdateRequested = busRouteUpdateRequested;}
+
+	public boolean getBusRouteUpdateRequestedTwice() {return busRouteUpdateRequestedTwice;}
+	public void setBusRouteUpdateRequestedTwice(boolean busRouteUpdateRequestedTwice) {this.busRouteUpdateRequestedTwice = busRouteUpdateRequestedTwice;}
+
+    public Integer getRouteUpdateId() {return routeUpdateId;}
+    public void setRouteUpdateId(Integer routeUpdateId) {this.routeUpdateId = routeUpdateId;}
+
+    public Integer getRouteUpdateStopIndex() {return routeUpdateStopIndex;}
+    public void setRouteUpdateStopIndex(Integer routeUpdateStopIndex) {this.routeUpdateStopIndex = routeUpdateStopIndex;}
 
 	@Override
 	public String toString() {
