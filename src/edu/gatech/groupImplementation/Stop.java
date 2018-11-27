@@ -204,6 +204,10 @@ public class Stop {
 			}
 		}
 	}
+
+	public void addRemovedPassengersFromBus(int removedPassengers) {
+		waitingPassengers += removedPassengers;
+	}
 	
 	public Double findDistance(Stop nextStop) {
 		return Double.valueOf(70.0D * Math.sqrt(Math.pow(latitude - nextStop.getLatitude(), 2.0D) + Math.pow(longitude - nextStop.getLongitude(), 2.0D)));

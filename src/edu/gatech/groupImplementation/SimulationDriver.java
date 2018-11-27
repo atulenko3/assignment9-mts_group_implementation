@@ -15,6 +15,8 @@ public class SimulationDriver {
     public void revertEvent() { mts.revertState(); }
 
     public void updateBusRoute(int busId, int routeId, int StopId) { mts.updateBusRoute(busId, routeId, StopId); }
+
+    public void updateBusCapacity(int busId, int newCapacity) { mts.updateBusCapacity(busId, newCapacity); }
 	
     public static void main(String[] args) {
     	SimulationDriver transitSimulation = new SimulationDriver();
@@ -76,6 +78,8 @@ public class SimulationDriver {
         }
         test20Runs(transitSimulation);
         //testBusRouteChange(transitSimulation);
+        //testBusRouteChangeTwice(transitSimulation);
+        //testBusCapacityChange(transitSimulation);
         //test1Revert(transitSimulation);
         //test2Revert(transitSimulation);
         //test3Revert(transitSimulation);
@@ -92,6 +96,19 @@ public class SimulationDriver {
         System.out.println(mts.getSystemEfficiency());
     }
 
+    private static void testBusCapacityChange(SimulationDriver transitSimulation) {
+        for(int i=0;i<10;i++) {
+            transitSimulation.moveNextBus();  //This command runs the simulation for a total of 20 events
+        }
+
+        System.out.println("Update Capacity");
+        transitSimulation.updateBusCapacity(62, 1);
+
+        for(int i=0;i<10;i++) {
+            transitSimulation.moveNextBus();  //This command runs the simulation for a total of 20 events
+        }
+    }
+
     private static void testBusRouteChange(SimulationDriver transitSimulation) {
         for(int i=0;i<10;i++) {
             transitSimulation.moveNextBus();  //This command runs the simulation for a total of 20 events
@@ -99,6 +116,26 @@ public class SimulationDriver {
 
         System.out.println("UpdateRoute");
         transitSimulation.updateBusRoute(62, 55, 2);
+
+        for(int i=0;i<10;i++) {
+            transitSimulation.moveNextBus();  //This command runs the simulation for a total of 20 events
+        }
+    }
+
+    private static void testBusRouteChangeTwice(SimulationDriver transitSimulation) {
+        for(int i=0;i<5;i++) {
+            transitSimulation.moveNextBus();  //This command runs the simulation for a total of 20 events
+        }
+
+        System.out.println("UpdateRoute");
+        transitSimulation.updateBusRoute(62, 55, 2);
+
+        for(int i=0;i<5;i++) {
+            transitSimulation.moveNextBus();  //This command runs the simulation for a total of 20 events
+        }
+
+        System.out.println("UpdateRoute");
+        transitSimulation.updateBusRoute(62, 53, 0);
 
         for(int i=0;i<10;i++) {
             transitSimulation.moveNextBus();  //This command runs the simulation for a total of 20 events

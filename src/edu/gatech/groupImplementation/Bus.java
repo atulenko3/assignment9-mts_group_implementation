@@ -13,6 +13,9 @@ public class Bus {
 	private boolean busRouteUpdateRequestedTwice = false;
 	private Integer routeUpdateId;
     private Integer routeUpdateStopIndex;
+	private boolean busCapacityUpdateRequested = false;
+	private boolean busCapacityUpdateRequestedTwice = false;
+	private Integer busCapcityUpdate;
 
 	
 	public Bus (int uniqueId,int routeId, int location, int initialCapacity, int speed) {
@@ -125,6 +128,16 @@ public class Bus {
 		previousLocation = Integer.valueOf(locationWithinRoute);
 	}
 
+	public int updateBusCapacity(Integer newCapacity) {
+		this.passengerCapacity = newCapacity;
+		if (this.passengerCapacity < this.passengers) {
+			int excessPassengers = this.passengers - this.passengerCapacity;
+			this.passengers = this.passengerCapacity;
+			return excessPassengers;
+		}
+		return 0;
+	}
+
 	public boolean getBusRouteUpdateRequested() {return busRouteUpdateRequested;}
     public void setBusRouteUpdateRequested(boolean busRouteUpdateRequested) {this.busRouteUpdateRequested = busRouteUpdateRequested;}
 
@@ -136,6 +149,15 @@ public class Bus {
 
     public Integer getRouteUpdateStopIndex() {return routeUpdateStopIndex;}
     public void setRouteUpdateStopIndex(Integer routeUpdateStopIndex) {this.routeUpdateStopIndex = routeUpdateStopIndex;}
+
+	public boolean getBusCapacityUpdateRequested() {return busCapacityUpdateRequested;}
+	public void setBusCapacityUpdateRequested(boolean busCapacityUpdateRequested) {this.busCapacityUpdateRequested = busCapacityUpdateRequested;}
+
+	public boolean getBusCapacityUpdateRequestedTwice() {return busCapacityUpdateRequestedTwice;}
+	public void setBusCapacityUpdateRequestedTwice(boolean busCapacityUpdateRequestedTwice) {this.busCapacityUpdateRequestedTwice = busCapacityUpdateRequestedTwice;}
+
+	public Integer getBusCapcityUpdate() {return busCapcityUpdate;}
+	public void setBusCapcityUpdate(Integer busCapcityUpdate) {this.busCapcityUpdate = busCapcityUpdate;}
 
 	@Override
 	public String toString() {

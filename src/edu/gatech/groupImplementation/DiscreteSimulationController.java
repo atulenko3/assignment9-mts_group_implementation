@@ -123,8 +123,8 @@ public class DiscreteSimulationController {
 				int nextStopId = activeRoute.getCurrentStop(nextLocation); //Based on the nextLocation on the route get the activeStopId
 				Stop nextStop = getStop(nextStopId); //Returns the stop object identified by nextStopId
 
-				boolean say = false;
 				//Update Bus Settings after it reaches a stop if requested
+				//This is messy :(
 				if (activeBus.getBusRouteUpdateRequested()) {
 					if (activeBus.getBusRouteUpdateRequestedTwice()){
 						activeRoute = getRoute(activeBus.getRouteUpdateId());
@@ -135,26 +135,25 @@ public class DiscreteSimulationController {
 						System.out.println("nextLocation: " + nextLocation);
 						nextStopId = activeRoute.getCurrentStop(nextLocation);
 						nextStop = getStop(nextStopId);
-
-//						activeLocation = activeBus.getRouteUpdateStopIndex();
-//						nextStop = getStop(activeRoute.getCurrentStop(activeLocation));
-//						nextLocation = activeBus.getNextLocation();
-//						nextStopId = activeRoute.getCurrentStop(nextLocation);
 						activeBus.setBusRouteUpdateRequested(false);
 						activeBus.setBusRouteUpdateRequestedTwice(false);
-						say = true;
 					}
 					else {
 						activeBus.setBusRouteUpdateRequestedTwice(true);
 					}
 				}
-				//System.out.println("nextLocation: " + nextLocation);
 
-				if (say) {
-//					System.out.println("activeLocation: " + activeLocation);
-//					System.out.println("activeRoute.getCurrentStop(nextLocation): " + activeRoute.getCurrentStop(activeLocation));
-//					System.out.println("nextStop: " + nextStop);
-//					System.out.println("activeRoute.getNextLocation(activeRoute.getCurrentStop(activeLocation)): " + activeRoute.getNextLocation(activeRoute.getCurrentStop(activeLocation)));
+				if (activeBus.getBusCapacityUpdateRequested()) {
+					if (activeBus.getBusCapacityUpdateRequestedTwice()) {
+						int removedPassengers = activeBus.updateBusCapacity(activeBus.getBusCapcityUpdate());
+						if (removedPassengers > 0) {
+							activeStop.addRemovedPassengersFromBus(removedPassengers);
+						}
+						activeBus.setBusCapacityUpdateRequested(false);
+						activeBus.setBusCapacityUpdateRequestedTwice(false);
+					} else {
+						activeBus.setBusCapacityUpdateRequestedTwice(true);
+					}
 				}
 
 				Double distanceBetweenStops = activeStop.findDistance(nextStop); //Calculates the distance between the activeStop and the nextStop
@@ -191,8 +190,13 @@ public class DiscreteSimulationController {
 		modifyBus.setRouteUpdateStopIndex(routeIndex);
 	}
 
-	public void updateBusCapacity(int busId, int busCapacity) {
-
+	public void updateBusCapacity(int busID, int busCapacity) {
+		if (!this.buses.containsKey(busID)) {
+			return;
+		}
+		Bus modifyBus = this.buses.get(busID);
+		modifyBus.setBusCapacityUpdateRequested(true);
+		modifyBus.setBusCapcityUpdate(busCapacity);
 	}
 	
 	public Stop getStop(int stopID) {
