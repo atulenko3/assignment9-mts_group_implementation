@@ -35,12 +35,10 @@ public class DiscreteSimulationController {
 		};
 		
 	// This method allows us to set the probabilities for each stop currently available in the system (based on the first setup file)
-	public void addProbabilities(int stopId,int ridersArriveHigh, int ridersArriveLow, int ridersOffHigh, int ridersOffLow, int ridersOnHigh, int ridersOnLow,int ridersDepartHigh, int ridersDepartLow) {
+	public void addProbabilities(int stopId,int ridersArriveHigh, int ridersArriveLow, int ridersOffHigh, int ridersOffLow, 
+			int ridersOnHigh, int ridersOnLow,int ridersDepartHigh, int ridersDepartLow) {
 		if (stops.containsKey(Integer.valueOf(stopId))) {
 			stops.get(stopId).setProbabilities(ridersArriveHigh,ridersArriveLow,ridersOffHigh,ridersOffLow,ridersOnHigh,ridersOnLow,ridersDepartHigh,ridersDepartLow);
-			System.out.println("StopId: " + stopId + ", exist in the current system - adding probability bounds!");
-		} else {
-			System.out.println("StopId: " + stopId + ", does not exist in the current system - ignoring command"); //If the stop doesnt exist, will print to console
 		}
 	}
 		
@@ -71,61 +69,54 @@ public class DiscreteSimulationController {
 				
 				Route activeRoute = getRoute(activeBus.getRoute()); //Returns the activeRoute the bus is on based on the route attribute of the bus object
 
-				int activeLocation = activeBus.getCurrentLocation(); //Returns the current location of the bus along the route
+				int activeLocation = activeBus.getNextLocation(); //Returns the current location of the bus along the route
 
 				int activeStopId = activeRoute.getCurrentStop(activeLocation); //Based on the activeLocation on the route get the activeStopId
 				Stop activeStop = getStop(activeStopId); //Returns the stop object identified by activeStopId
 
 				updateSystemStates(activeBus, activeStop, eventQueueSnapshot);
 
-				//TODO Passenger Management
 				/**************************/
-//				int ridersArrive, ridersOff, ridersOn, ridersDepart;
-//				//Step 1
-//				try {
-//					ridersArrive = rand.ints(activeStop.getRidersArriveLow().intValue(),activeStop.getRidersArriveHigh().intValue()).findFirst().getAsInt();
-//					}
-//				catch (IllegalArgumentException e) { //Need this catch here since some of the bounds in the file are the same
-//					ridersArrive = activeStop.getRidersArriveLow().intValue();
-//				}
-//
-//				activeStop.ridersWaiting(ridersArrive); //Populates the waitingPassengers group
-//
-//				//Step 2
-//				try {
-//					ridersOff = rand.ints(activeStop.getRidersOffLow().intValue(),activeStop.getRidersOffHigh().intValue()).findFirst().getAsInt();
-//					}
-//				catch (IllegalArgumentException e) { //Need this catch here since some of the bounds in the file are the same
-//					ridersOff = activeStop.getRidersOffLow().intValue();
-//				}
-//
-//				activeStop.setTransferRiders(activeBus.ridersOff(ridersOff)); //Takes passengers off the bus, and updates the transfer group
-//
-//				//Step 3
-//				try {
-//					ridersOn = rand.ints(activeStop.getRidersOnLow().intValue(),activeStop.getRidersOnHigh().intValue()).findFirst().getAsInt();
-//					}
-//				catch (IllegalArgumentException e) { //Need this catch here since some of the bounds in the file are the same
-//					ridersOn = activeStop.getRidersOnLow().intValue();
-//				}
-//
-//				activeStop.boardPassengers(activeBus.ridersOn(ridersOn)); // Board passengers, if greater than the capacity, overflow passengers get added back to waitingGroup
-//
-//				//Step 4
-//				try {
-//					ridersDepart = rand.ints(activeStop.getRidersDepartLow().intValue(), activeStop.getRidersDepartHigh().intValue()).findFirst().getAsInt();
-//				}
-//				catch (IllegalArgumentException e) {
-//					ridersDepart = activeStop.getRidersDepartLow().intValue();
-//				}
-//
-//				int transferRidersCurrent = activeStop.getTransferRiders().intValue();
-//
-//				if (ridersDepart <= transferRidersCurrent) {
-//					activeStop.updateTransfers(ridersDepart);
-//				} else {
-//					activeStop.updateWaiting(ridersDepart);
-//				}
+				int ridersArrive, ridersOff, ridersOn, ridersDepart;
+				//Step 1
+				try {
+					ridersArrive = rand.ints(activeStop.getRidersArriveLow().intValue(),activeStop.getRidersArriveHigh().intValue()).findFirst().getAsInt();
+					} 
+				catch (IllegalArgumentException e) { //Need this catch here since some of the bounds in the file are the same 
+					ridersArrive = activeStop.getRidersArriveLow().intValue();
+				}
+				
+				activeStop.ridersWaiting(ridersArrive); //Populates the waitingPassengers group
+				
+				//Step 2
+				try {
+					ridersOff = rand.ints(activeStop.getRidersOffLow().intValue(),activeStop.getRidersOffHigh().intValue()).findFirst().getAsInt();
+					} 
+				catch (IllegalArgumentException e) { //Need this catch here since some of the bounds in the file are the same 
+					ridersOff = activeStop.getRidersOffLow().intValue();
+				} 
+	
+				activeStop.setTransferRiders(activeBus.ridersOff(ridersOff)); //Takes passengers off the bus, and updates the transfer group
+				
+				//Step 3
+				try {
+					ridersOn = rand.ints(activeStop.getRidersOnLow().intValue(),activeStop.getRidersOnHigh().intValue()).findFirst().getAsInt();
+					} 
+				catch (IllegalArgumentException e) { //Need this catch here since some of the bounds in the file are the same 
+					ridersOn = activeStop.getRidersOnLow().intValue();
+				} 
+				
+				activeStop.boardPassengers(activeBus.ridersOn(ridersOn)); // Board passengers, if greater than the capacity. Overflow passengers get added back to waitingGroup
+				
+				//Step 4
+				try {
+					ridersDepart = rand.ints(activeStop.getRidersDepartLow().intValue(), activeStop.getRidersDepartHigh().intValue()).findFirst().getAsInt();
+				}
+				catch (IllegalArgumentException e) {
+					ridersDepart = activeStop.getRidersDepartLow().intValue();
+				}
+				
+				activeStop.updateTransfers(ridersDepart);
 				
 				/*********************/
 				int nextLocation = activeRoute.getNextLocation(activeLocation); //Based on the activeLocation, returns the nextLocation's position on the route
@@ -175,9 +166,11 @@ public class DiscreteSimulationController {
 
 				eventQueue.add(new Event(nextArrivalTime, "move_bus", activeEvent.getId())); //Queue the next event for this bus that is to occur at the previously calculated logical time
 
-//				System.out.println("Riders Arrive: " + ridersArrive + ", Riders Off: " + ridersOff + ", Riders On: " + ridersOn + ", Riders Depart: " + ridersDepart);
-//				System.out.println("Waiting Pool: " + activeStop.getWaitingPassengers() + ", transferRiders: " + activeStop.getTransferRiders());
-				System.out.println("b:" + activeBus.getId() + "->s:" + nextStopId + "@" + activeBus.getArrivalTime() + "//p:" + activeBus.getPassengers() + "/bc: " + activeBus.getPassengerCapacity()); //Output summary to console for each event
+				//System.out.println("Riders Arrive: " + ridersArrive + ", Riders Off: " + ridersOff + ", Riders On: " + ridersOn + ", Riders Depart: " + ridersDepart);
+				//System.out.println("StopId: " + activeStop.getId() + " - " + activeStop.getName() + ", Waiting Pool: " + activeStop.getWaitingPassengers() + ", transferRiders: " + activeStop.getTransferRiders());
+				//System.out.println("b:" + activeBus.getId() + "->s:" + nextStopId + "@" + activeBus.getArrivalTime() + "//p:" + activeBus.getPassengers() + "/bc: " + activeBus.getPassengerCapacity() + "\n"); //Output summary to console for each event
+				System.out.println("b:" + activeBus.getId() + "->s:" + nextStopId + "@" + activeBus.getArrivalTime() + "//p:" + activeBus.getPassengers() + "/f:0");  //Includes passenger exchange simulations
+				//System.out.println("b:" + activeBus.getId() + "->s:" + nextStopId + "@" + activeBus.getArrivalTime() + "//p:0/f:0"); //Output as-of HW5
 				break;
 			default:
 				System.out.println("This is not valid event");
