@@ -4,7 +4,7 @@ public class Bus {
 	private Integer id;
 	private Integer route;
 	private Integer nextLocation;
-	private Integer currentLocation;
+	private Integer previousLocation;
 	private Integer passengers = 0;
 	private Integer passengerCapacity;
 	private Integer averageSpeed;
@@ -13,7 +13,8 @@ public class Bus {
 	public Bus (int uniqueId,int routeId, int location, int initialCapacity, int speed) {
 		id = Integer.valueOf(uniqueId);
 		route = Integer.valueOf(routeId);
-		nextLocation = currentLocation = Integer.valueOf(location);
+		nextLocation = Integer.valueOf(location);
+		previousLocation = Integer.valueOf(location);
 		passengerCapacity = Integer.valueOf(initialCapacity);
 		averageSpeed = Integer.valueOf(speed);
 		}
@@ -24,7 +25,7 @@ public class Bus {
         id = bus.getId();
         route = bus.getRoute();
         nextLocation = bus.getNextLocation();
-        currentLocation = bus.getCurrentLocation();
+        previousLocation = bus.getPreviousLocation();
         passengers = bus.getPassengers();
         passengerCapacity = bus.getPassengerCapacity();
         averageSpeed = bus.getAverageSpeed();
@@ -51,12 +52,12 @@ public class Bus {
 		return nextLocation;
 	}
 
-	public Integer getCurrentLocation() {
-		return currentLocation;
+	public Integer getPreviousLocation() {
+		return previousLocation;
 	}
 
 	public void setLocation(int newLocation) {
-		currentLocation = nextLocation;
+		previousLocation = nextLocation;
 		nextLocation = Integer.valueOf(newLocation);
 	}
 
@@ -70,10 +71,10 @@ public class Bus {
 
 	public Integer ridersOff(int ridersOff) {
 		if (ridersOff <= this.passengers.intValue()) {
-			passengers =- ridersOff;
+			passengers -= ridersOff;
 			return Integer.valueOf(ridersOff);
 		} else {
-			int totalPassengers = passengers;
+			int totalPassengers = this.passengers.intValue();
 			passengers = 0;
 			return Integer.valueOf(totalPassengers);
 		}
@@ -81,11 +82,11 @@ public class Bus {
 
 	public Integer ridersOn(int ridersOn) {
 		if (ridersOn <= (passengerCapacity.intValue() - passengers.intValue())) {
-			passengers =+ ridersOn;
+			passengers += ridersOn;
 			return ridersOn;
 		} else {
 			passengers = passengerCapacity;
-			return passengerCapacity.intValue() - passengers.intValue();
+			return (passengerCapacity.intValue() - passengers.intValue());
 		}
 		
 	}
@@ -116,7 +117,7 @@ public class Bus {
 	
 	public void updateRoute(int routeId, int locationWithinRoute) {
 		route = Integer.valueOf(routeId);
-		currentLocation = Integer.valueOf(locationWithinRoute);
+		previousLocation = Integer.valueOf(locationWithinRoute);
 	}
 
 	@Override

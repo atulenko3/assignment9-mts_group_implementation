@@ -154,7 +154,6 @@ public class Stop {
 			waitingPassengers -= ridersOn;
 		} else {
 			waitingPassengers = 0;
-			System.out.println("More passengers got on than there were available --> fix logic");
 		}
 	}	
 	
@@ -191,15 +190,21 @@ public class Stop {
 	}
 
 	public void updateTransfers(int ridersDepart) {
-		int nowWaiting = transferRiders - ridersDepart;
-		transferRiders -= ridersDepart;
-		waitingPassengers += nowWaiting;
+		if (ridersDepart <= transferRiders.intValue()) {
+			transferRiders -= Integer.valueOf(ridersDepart);
+			waitingPassengers += transferRiders;
+			transferRiders = 0;
+		} else {
+			int angryRiders = ridersDepart - transferRiders.intValue();
+			transferRiders = Integer.valueOf(0);
+			if (waitingPassengers >= angryRiders) {
+				waitingPassengers -= Integer.valueOf(angryRiders);
+			} else {
+				waitingPassengers = Integer.valueOf(0);
+			}
+		}
 	}
 
-	public void updateWaiting(int ridersDepart) {
-		waitingPassengers += (transferRiders - ridersDepart);
-		transferRiders = Integer.valueOf(0);
-	}
 	
 	public Double findDistance(Stop nextStop) {
 		return Double.valueOf(70.0D * Math.sqrt(Math.pow(latitude - nextStop.getLatitude(), 2.0D) + Math.pow(longitude - nextStop.getLongitude(), 2.0D)));

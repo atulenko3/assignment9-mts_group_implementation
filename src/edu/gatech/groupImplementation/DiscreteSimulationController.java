@@ -38,9 +38,9 @@ public class DiscreteSimulationController {
 	public void addProbabilities(int stopId,int ridersArriveHigh, int ridersArriveLow, int ridersOffHigh, int ridersOffLow, int ridersOnHigh, int ridersOnLow,int ridersDepartHigh, int ridersDepartLow) {
 		if (stops.containsKey(Integer.valueOf(stopId))) {
 			stops.get(stopId).setProbabilities(ridersArriveHigh,ridersArriveLow,ridersOffHigh,ridersOffLow,ridersOnHigh,ridersOnLow,ridersDepartHigh,ridersDepartLow);
-			System.out.println("StopId: " + stopId + ", exist in the current system - adding probability bounds!");
+			//System.out.println("StopId: " + stopId + ", exist in the current system - adding probability bounds!");
 		} else {
-			System.out.println("StopId: " + stopId + ", does not exist in the current system - ignoring command"); //If the stop doesnt exist, will print to console
+			//System.out.println("StopId: " + stopId + ", does not exist in the current system - ignoring command"); //If the stop doesnt exist, will print to console
 		}
 	}
 		
@@ -70,7 +70,7 @@ public class DiscreteSimulationController {
 				
 				Route activeRoute = getRoute(activeBus.getRoute()); //Returns the activeRoute the bus is on based on the route attribute of the bus object
 				
-				int activeLocation = activeBus.getCurrentLocation(); //Returns the current location of the bus along the route
+				int activeLocation = activeBus.getNextLocation(); //Returns the current location of the bus along the route
 				
 				int activeStopId = activeRoute.getCurrentStop(activeLocation); //Based on the activeLocation on the route get the activeStopId
 				Stop activeStop = getStop(activeStopId); //Returns the stop object identified by activeStopId
@@ -118,13 +118,7 @@ public class DiscreteSimulationController {
 					ridersDepart = activeStop.getRidersDepartLow().intValue();
 				}
 				
-				int transferRidersCurrent = activeStop.getTransferRiders().intValue();
-				
-				if (ridersDepart <= transferRidersCurrent) {
-					activeStop.updateTransfers(ridersDepart);
-				} else {
-					activeStop.updateWaiting(ridersDepart);
-				}
+				activeStop.updateTransfers(ridersDepart);
 				
 				/*********************/
 				
@@ -139,9 +133,11 @@ public class DiscreteSimulationController {
 				activeBus.setArrivalTime(nextArrivalTime); //Updates the arrivalTime attribute of the bus object
 				eventQueue.add(new Event(nextArrivalTime, "move_bus", activeEvent.getId())); //Queue the next event for this bus that is to occur at the previously calculated logical time
 				
-				System.out.println("Riders Arrive: " + ridersArrive + ", Riders Off: " + ridersOff + ", Riders On: " + ridersOn + ", Riders Depart: " + ridersDepart);
-				System.out.println("Waiting Pool: " + activeStop.getWaitingPassengers() + ", transferRiders: " + activeStop.getTransferRiders());
-				System.out.println("b:" + activeBus.getId() + "->s:" + nextStopId + "@" + activeBus.getArrivalTime() + "//p:" + activeBus.getPassengers() + "/bc: " + activeBus.getPassengerCapacity()); //Output summary to console for each event
+				//System.out.println("Riders Arrive: " + ridersArrive + ", Riders Off: " + ridersOff + ", Riders On: " + ridersOn + ", Riders Depart: " + ridersDepart);
+				//System.out.println("StopId: " + activeStop.getId() + " - " + activeStop.getName() + ", Waiting Pool: " + activeStop.getWaitingPassengers() + ", transferRiders: " + activeStop.getTransferRiders());
+				//System.out.println("b:" + activeBus.getId() + "->s:" + nextStopId + "@" + activeBus.getArrivalTime() + "//p:" + activeBus.getPassengers() + "/bc: " + activeBus.getPassengerCapacity() + "\n"); //Output summary to console for each event
+				//System.out.println("b:" + activeBus.getId() + "->s:" + nextStopId + "@" + activeBus.getArrivalTime() + "//p:" + activeBus.getPassengers() + "/f:0");
+				System.out.println("b:" + activeBus.getId() + "->s:" + nextStopId + "@" + activeBus.getArrivalTime() + "//p:0/f:0");
 				break;
 			default:
 				System.out.println("This is not valid event");

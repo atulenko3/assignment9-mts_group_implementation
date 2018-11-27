@@ -89,7 +89,7 @@ public class SimulationDriver {
         for(int i=0;i<20;i++) {
             transitSimulation.moveNextBus();  //This command runs the simulation for a total of 20 events
         }
-        System.out.println(mts.getSystemEfficiency());
+        //System.out.println(mts.getSystemEfficiency());
     }
 
     private static void test1Revert(SimulationDriver transitSimulation) {
