@@ -35,12 +35,10 @@ public class DiscreteSimulationController {
 		};
 		
 	// This method allows us to set the probabilities for each stop currently available in the system (based on the first setup file)
-	public void addProbabilities(int stopId,int ridersArriveHigh, int ridersArriveLow, int ridersOffHigh, int ridersOffLow, int ridersOnHigh, int ridersOnLow,int ridersDepartHigh, int ridersDepartLow) {
+	public void addProbabilities(int stopId,int ridersArriveHigh, int ridersArriveLow, int ridersOffHigh, int ridersOffLow, 
+			int ridersOnHigh, int ridersOnLow,int ridersDepartHigh, int ridersDepartLow) {
 		if (stops.containsKey(Integer.valueOf(stopId))) {
 			stops.get(stopId).setProbabilities(ridersArriveHigh,ridersArriveLow,ridersOffHigh,ridersOffLow,ridersOnHigh,ridersOnLow,ridersDepartHigh,ridersDepartLow);
-			//System.out.println("StopId: " + stopId + ", exist in the current system - adding probability bounds!");
-		} else {
-			//System.out.println("StopId: " + stopId + ", does not exist in the current system - ignoring command"); //If the stop doesnt exist, will print to console
 		}
 	}
 		
@@ -77,7 +75,6 @@ public class DiscreteSimulationController {
 
 				updateSystemStates(activeBus, activeStop, eventQueueSnapshot);
 
-				//TODO Passenger Management
 				/**************************/
 				int ridersArrive, ridersOff, ridersOn, ridersDepart;
 				//Step 1
@@ -108,7 +105,7 @@ public class DiscreteSimulationController {
 					ridersOn = activeStop.getRidersOnLow().intValue();
 				} 
 				
-				activeStop.boardPassengers(activeBus.ridersOn(ridersOn)); // Board passengers, if greater than the capacity, overflow passengers get added back to waitingGroup
+				activeStop.boardPassengers(activeBus.ridersOn(ridersOn)); // Board passengers, if greater than the capacity. Overflow passengers get added back to waitingGroup
 				
 				//Step 4
 				try {
@@ -136,8 +133,8 @@ public class DiscreteSimulationController {
 				//System.out.println("Riders Arrive: " + ridersArrive + ", Riders Off: " + ridersOff + ", Riders On: " + ridersOn + ", Riders Depart: " + ridersDepart);
 				//System.out.println("StopId: " + activeStop.getId() + " - " + activeStop.getName() + ", Waiting Pool: " + activeStop.getWaitingPassengers() + ", transferRiders: " + activeStop.getTransferRiders());
 				//System.out.println("b:" + activeBus.getId() + "->s:" + nextStopId + "@" + activeBus.getArrivalTime() + "//p:" + activeBus.getPassengers() + "/bc: " + activeBus.getPassengerCapacity() + "\n"); //Output summary to console for each event
-				//System.out.println("b:" + activeBus.getId() + "->s:" + nextStopId + "@" + activeBus.getArrivalTime() + "//p:" + activeBus.getPassengers() + "/f:0");
-				System.out.println("b:" + activeBus.getId() + "->s:" + nextStopId + "@" + activeBus.getArrivalTime() + "//p:0/f:0");
+				System.out.println("b:" + activeBus.getId() + "->s:" + nextStopId + "@" + activeBus.getArrivalTime() + "//p:" + activeBus.getPassengers() + "/f:0");  //Includes passenger exchange simulations
+				//System.out.println("b:" + activeBus.getId() + "->s:" + nextStopId + "@" + activeBus.getArrivalTime() + "//p:0/f:0"); //Output as-of HW5
 				break;
 			default:
 				System.out.println("This is not valid event");
